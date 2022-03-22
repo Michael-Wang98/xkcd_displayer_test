@@ -1,14 +1,4 @@
-/**
- * STEPS:
- * 1. create a requestController class and define the needed variables for the API call
- * 2. Create a method that will get the current (last added) comic and set the currentComicsNumber and
- *    maxComicsNumber accordingly, call that method on load
- * 3. Register an event for the random comic number and add all the chain of event to display it
- * 4. Add Previous/Next, First/Last and get Comic by ID functionality to the app
- * 5. Adjust UI states accordingly
- */
-
- class DomInterface {
+class DomInterface {
     constructor() {
         this.form = document.querySelector('#comic-form');
         this.searchField = document.querySelector('#search-input');
@@ -24,8 +14,6 @@
             previous: document.querySelector('#request-prev'),
             next: document.querySelector('#request-next'),
             random: document.querySelector('#request-random'),
-            first: document.querySelector('#request-first'),
-            last: document.querySelector('#request-last'),
         };
     }
 
@@ -158,9 +146,6 @@ class requestController {
         this.DomInterface.controls.random.addEventListener('click', () =>
             this.getComicByNumber(this.getRandomComicNumber())
         );
-
-        this.DomInterface.controls.first.addEventListener('click', () => this.getComicByNumber(1));
-        this.DomInterface.controls.last.addEventListener('click', () => this.getComicByNumber(this.maxComicsNumber));
 
         this.DomInterface.controls.previous.addEventListener('click', () => this.getPreviousComic());
         this.DomInterface.controls.next.addEventListener('click', () => this.getNextComic());
