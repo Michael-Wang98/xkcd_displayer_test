@@ -79,8 +79,23 @@ class requestController {
         this.currentComic = 'info.0.json';
         this.superAgent = superagent;
 
+        this.currentComicsNumber = 0;
+        this.maxComicsNumber = 0;
+
         this.getLatestComic();
         this.DomInterface.hideLoader();
+    }
+
+    setMaxComicsNumber(num) {
+        this.maxComicsNumber = num;
+    }
+
+    setCurrentComicsNumber(num) {
+        this.currentComicsNumber = num;
+    }
+
+    getRandomNumber(){
+        const rand = Math.random()
     }
 
     getLatestComic() {
@@ -91,8 +106,32 @@ class requestController {
             }
             const data = response.body;
             this.DomInterface.showComics(data);
-            
+            this.setCurrentComicsNumber(data.num);
+            this.setMaxComicsNumber(data.num);
         });
+    }
+
+    getComicsByNumber(num) {
+        this.DomInterface.hideErrors();
+        this.DomInterface.showLoader();
+        this.DomInterface.clearResults();
+
+        const requestUrl = `${this.corsHeader}/${this.URL}/${num}/${this.currentComic}`;
+        console.log(requestUrl);
+        this.superAgent.get(requestUrl).end((error, response) => {
+            if (error) {
+                this.DomInterface.showError();
+            }
+
+            const data = response.body;
+
+            this.setCurrentComicsNumber(data.num);
+            this.DomInterface.showComics(data);
+        });
+    }
+
+    registerEvents() {
+        this.DomInterface.controls.first.addEventListener('click', () => this.getComicsByNumber(1));
     }
 }
 
