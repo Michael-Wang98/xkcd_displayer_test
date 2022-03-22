@@ -76,52 +76,50 @@ class requestController {
         this.DomInterface = new DomInterface();
         this.corsHeader = 'https://the-ultimate-api-challenge.herokuapp.com';
         this.URL = 'https://xkcd.com';
-        this.currentComic = 'info.0.json';
+        this.suffix = 'info.0.json';
         this.superAgent = superagent;
 
         this.currentComicsNumber = 0;
         this.maxComicsNumber = 0;
 
-        this.getLatestComic();
-        this.DomInterface.hideLoader();
+        this.getCurrentComic();
+        this.registerEvents();
     }
 
-    setMaxComicsNumber(num) {
-        this.maxComicsNumber = num;
+    setCurrentComicsNumber(number) {
+        this.currentComicsNumber = number;
     }
 
-    setCurrentComicsNumber(num) {
-        this.currentComicsNumber = num;
+    setMaxComicsNumber(number) {
+        this.maxComicsNumber = number;
     }
 
-    getRandomNumber(){
-        const rand = Math.random()
+    getRandomComicNumber() {
+        return Math.floor(Math.random() * this.maxComicsNumber + 1);
     }
 
-    getLatestComic() {
-        const requestUrl = `${this.corsHeader}/${this.URL}/${this.currentComic}`;
+    getCurrentComic() {
+        const requestUrl = `${this.corsHeader}/${this.URL}/${this.suffix}`;
+
         this.superAgent.get(requestUrl).end((error, response) => {
-            if (error) {
-                this.DomInterface.showError();
-            }
+            if (error) { this.DomInterface.showError(); }
             const data = response.body;
+
             this.DomInterface.showComics(data);
             this.setCurrentComicsNumber(data.num);
             this.setMaxComicsNumber(data.num);
         });
     }
 
-    getComicsByNumber(num) {
+    getComicByNumber(number) {
         this.DomInterface.hideErrors();
         this.DomInterface.showLoader();
         this.DomInterface.clearResults();
 
-        const requestUrl = `${this.corsHeader}/${this.URL}/${num}/${this.currentComic}`;
-        console.log(requestUrl);
+        const requestUrl = `${this.corsHeader}/${this.URL}/${number}/${this.suffix}`;
+
         this.superAgent.get(requestUrl).end((error, response) => {
-            if (error) {
-                this.DomInterface.showError();
-            }
+            if (error) { this.DomInterface.showError(); }
 
             const data = response.body;
 
@@ -130,8 +128,44 @@ class requestController {
         });
     }
 
+    getPreviousComic() {
+        const requestedComicsNumber = this.currentComicsNumber - 1;
+        if (requestedComicsNumber < 1) { return };
+
+        this.getComicByNumber(requestedComicsNumber);
+    }
+
+    getNextComic() {
+        const requestedComicsNumber = this.currentComicsNumber + 1;
+        if (requestedComicsNumber > this.maxComicsNumber) { return };
+
+        this.getComicByNumber(requestedComicsNumber);
+    }
+
+    getComicById(e) {
+        e.preventDefault();
+
+        const query = this.DomInterface.searchField.value;
+        if (!query || query === '') { return };
+        if (query < 1 || query > this.maxComicsNumber) {
+            return this.DomInterface.showFormError(`Try a number between 1 and ${this.maxComicsNumber}`);
+        }
+
+        this.getComicByNumber(query);
+    }
+
     registerEvents() {
-        this.DomInterface.controls.first.addEventListener('click', () => this.getComicsByNumber(1));
+        this.DomInterface.controls.random.addEventListener('click', () =>
+            this.getComicByNumber(this.getRandomComicNumber())
+        );
+
+        this.DomInterface.controls.first.addEventListener('click', () => this.getComicByNumber(1));
+        this.DomInterface.controls.last.addEventListener('click', () => this.getComicByNumber(this.maxComicsNumber));
+
+        this.DomInterface.controls.previous.addEventListener('click', () => this.getPreviousComic());
+        this.DomInterface.controls.next.addEventListener('click', () => this.getNextComic());
+
+        this.DomInterface.form.addEventListener('submit', e => this.getComicById(e));
     }
 }
 
