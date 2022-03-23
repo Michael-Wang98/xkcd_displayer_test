@@ -5,6 +5,7 @@ class DomInterface {
 
         this.title = document.querySelector('#comic-title');
         this.image = document.querySelector('#comic-image');
+        this.date = document.querySelector('#comic-date');
 
         this.error = document.querySelector('#error');
         this.formError = document.querySelector('#form-error');
@@ -21,6 +22,7 @@ class DomInterface {
         this.title.innerHTML = 'Loading...';
         this.image.src = '';
         this.image.alt = '';
+        this.image.title = '';
     }
 
     hideLoader() {
@@ -49,11 +51,17 @@ class DomInterface {
     }
 
     showComics(data) {
-        const { title, img } = data;
+        const { title, img, month, day, year } = data;
 
         this.title.innerHTML = title;
         this.image.src = img;
-        if (data.alt) this.image.alt = data.alt;
+        
+        if (data.alt) { 
+            this.image.title = data.alt; // display text when mousing over image
+            this.image.alt = data.alt; // display text if image fails to load
+        };
+        
+        this.date.innerHTML = `Published: ${month}, ${day}, ${year}`;
 
         this.hideLoader();
     }
