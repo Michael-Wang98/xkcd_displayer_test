@@ -1,13 +1,33 @@
 body {
-    font-family: 'Shadows Into Light', cursive;
+    font-family: 'Courier New';
+    background-color:#96A8C8;
+}
+
+button {
+    background-color: #6E7B91;
+    color: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #000000;
+    padding: 4px 20px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #ffffff;
+    color: #6E7B91;
 }
 
 .main__container {
     margin: 0 auto;
     text-align: center;
+    background-color:#ffffff;
+    max-width : 60vw;
+    height: 100%;
 }
 .main__title {
     font-size: 4rem;
+    font-weight: bold;
 }
 
 .loader__container {
@@ -47,7 +67,7 @@ body {
     }
 
     50% {
-        transform: rotateY(180deg);
+        transform: rotateX(180deg);
     }
 
     100% {

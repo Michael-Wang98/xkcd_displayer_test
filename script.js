@@ -12,6 +12,8 @@ class DomInterface {
         this.loader = document.querySelector('#loader');
 
         this.controls = {
+            first: document.querySelector('#request-first'),
+            last: document.querySelector('#request-last'),
             previous: document.querySelector('#request-prev'),
             next: document.querySelector('#request-next'),
             random: document.querySelector('#request-random'),
@@ -51,7 +53,7 @@ class DomInterface {
     }
 
     showComics(data) {
-        const { title, img, month, day, year } = data;
+        const { title, img, month, day, year, num } = data;
 
         this.title.innerHTML = title;
         this.image.src = img;
@@ -61,7 +63,7 @@ class DomInterface {
             this.image.alt = data.alt; // display text if image fails to load
         };
         
-        this.date.innerHTML = `Published: ${month}, ${day}, ${year}`;
+        this.date.innerHTML = `XKCD #${num} Published: ${month}, ${day}, ${year}`;
 
         this.hideLoader();
     }
@@ -75,10 +77,17 @@ class requestController {
         this.suffix = 'info.0.json';
         this.superAgent = superagent;
 
-        this.currentComicsNumber = 0;
-        this.maxComicsNumber = 0;
+        const requestUrl = `${this.corsHeader}/${this.URL}/${this.suffix}`; // GET most recent comic
 
-        this.getCurrentComic();
+        this.superAgent.get(requestUrl).end((error, response) => {
+            if (error) { this.DomInterface.showError(); }
+            const data = response.body;
+
+            this.DomInterface.showComics(data);
+            this.setCurrentComicsNumber(data.num);
+            this.setMaxComicsNumber(data.num);
+        });
+
         this.registerEvents();
     }
 
@@ -92,19 +101,6 @@ class requestController {
 
     getRandomComicNumber() {
         return Math.floor(Math.random() * this.maxComicsNumber + 1);
-    }
-
-    getCurrentComic() {
-        const requestUrl = `${this.corsHeader}/${this.URL}/${this.suffix}`;
-
-        this.superAgent.get(requestUrl).end((error, response) => {
-            if (error) { this.DomInterface.showError(); }
-            const data = response.body;
-
-            this.DomInterface.showComics(data);
-            this.setCurrentComicsNumber(data.num);
-            this.setMaxComicsNumber(data.num);
-        });
     }
 
     getComicByNumber(number) {
@@ -154,6 +150,9 @@ class requestController {
         this.DomInterface.controls.random.addEventListener('click', () =>
             this.getComicByNumber(this.getRandomComicNumber())
         );
+
+        this.DomInterface.controls.first.addEventListener('click', () => this.getComicByNumber(1));
+        this.DomInterface.controls.last.addEventListener('click', () => this.getComicByNumber(this.maxComicsNumber));
 
         this.DomInterface.controls.previous.addEventListener('click', () => this.getPreviousComic());
         this.DomInterface.controls.next.addEventListener('click', () => this.getNextComic());
