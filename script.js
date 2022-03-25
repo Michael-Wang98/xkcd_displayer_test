@@ -77,17 +77,10 @@ class requestController {
         this.suffix = 'info.0.json';
         this.superAgent = superagent;
 
-        const requestUrl = `${this.corsHeader}/${this.URL}/${this.suffix}`; // GET most recent comic
+        this.currentComicsNumber = 0;
+        this.maxComicsNumber = 0;
 
-        this.superAgent.get(requestUrl).end((error, response) => {
-            if (error) { this.DomInterface.showError(); }
-            const data = response.body;
-
-            this.DomInterface.showComics(data);
-            this.setCurrentComicsNumber(data.num);
-            this.setMaxComicsNumber(data.num);
-        });
-
+        this.getCurrentComic();
         this.registerEvents();
     }
 
@@ -101,6 +94,19 @@ class requestController {
 
     getRandomComicNumber() {
         return Math.floor(Math.random() * this.maxComicsNumber + 1);
+    }
+
+    getCurrentComic() {
+        const requestUrl = `${this.corsHeader}/${this.URL}/${this.suffix}`;
+
+        this.superAgent.get(requestUrl).end((error, response) => {
+            if (error) { this.DomInterface.showError(); }
+            const data = response.body;
+
+            this.DomInterface.showComics(data);
+            this.setCurrentComicsNumber(data.num);
+            this.setMaxComicsNumber(data.num);
+        });
     }
 
     getComicByNumber(number) {
