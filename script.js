@@ -72,6 +72,7 @@ class DomInterface {
 class requestController {
     constructor() {
         this.DomInterface = new DomInterface();
+        // Use CORS Anywhere running from a Heroku dyno to attach CORS headers to request allowing for cross-origin requests
         this.corsHeader = 'https://murmuring-anchorage-90283.herokuapp.com';
         this.URL = 'https://xkcd.com';
         this.suffix = 'info.0.json';
